@@ -7,5 +7,10 @@ class InvoiceSpec extends FreeSpec with Matchers {
     "can be created" in {
       new Invoice()
     }
+    "can add a recipient" in {
+      val invoice = new Invoice()
+      invoice.addRecipient("Recipient")
+      invoice.recipients should have size 1
+    }
   }
 }
