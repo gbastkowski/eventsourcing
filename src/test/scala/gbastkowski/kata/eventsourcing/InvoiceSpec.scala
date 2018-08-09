@@ -26,8 +26,8 @@ class InvoiceSpec extends FreeSpec with Matchers {
         invoice.send().sent shouldBe defined
       }
 
-      "can be reminded" in {
-        invoice.remind().reminded shouldBe defined
+      "cannot be reminded" in {
+        an[IllegalArgumentException] should be thrownBy invoice.remind()
       }
     }
 
@@ -47,6 +47,10 @@ class InvoiceSpec extends FreeSpec with Matchers {
 
       "cannot remove items" in {
         an[IllegalArgumentException] should be thrownBy invoice.removeItem(invoice.items(0))
+      }
+
+      "can be reminded" in {
+        invoice.remind().reminded shouldBe defined
       }
     }
   }

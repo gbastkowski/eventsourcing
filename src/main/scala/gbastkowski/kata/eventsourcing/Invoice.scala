@@ -31,6 +31,7 @@ case class Invoice(
   def send(): Invoice = Invoice(id, recipient, items, Some(LocalDateTime.now()), reminded, paymentReceived)
 
   def remind(): Invoice = {
+    require(sent.isDefined)
     Invoice(id, recipient, items, sent, Some(LocalDateTime.now()), paymentReceived)
   }
 
