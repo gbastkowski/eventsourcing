@@ -1,0 +1,8 @@
+* Immutable Domain Model
+This kata is my own creation. Well, kind of.
+
+It's inspired by the blog posts at https://tech.zilverline.com/2011/02/01/towards-an-immutable-domain-model-introduction-part-1. 
+The aim here is to turn a simple mutable domain model into an immutable version
+with event sourcing and all the fuzz.
+
+
