@@ -1,5 +1,6 @@
 package gbastkowski.kata.eventsourcing
 
+import java.time.LocalDateTime
 import org.scalatest._
 
 class InvoiceSpec extends FreeSpec with Matchers {
@@ -28,6 +29,10 @@ class InvoiceSpec extends FreeSpec with Matchers {
 
       "cannot be reminded" in {
         an[IllegalArgumentException] should be thrownBy invoice.remind()
+      }
+
+      "cannot receive payments" in {
+        an[IllegalArgumentException] should be thrownBy invoice.paymentReceived(LocalDateTime.now())
       }
     }
 
