@@ -3,8 +3,7 @@ package gbastkowski.kata.eventsourcing
 import java.time.LocalDateTime
 import scala.collection.mutable
 
-class Invoice {
-  var id: Option[Int] = None
+case class Invoice(id: Option[Int] = None) {
   val items: mutable.ListBuffer[InvoiceItem] = mutable.ListBuffer()
   private[this] var totalAmount: Int = 0
   var recipient: Option[String] = None
