@@ -25,5 +25,17 @@ class InvoiceSpec extends FreeSpec with Matchers {
       val invoice = new Invoice()
       invoice.changeRecipient(Some("Recipient"))
     }
+
+    "can be sent" in {
+      val invoice = new Invoice()
+      invoice.send()
+      invoice.sent shouldBe defined
+    }
+
+    "can be reminded" in {
+      val invoice = new Invoice()
+      invoice.remind()
+      invoice.reminded shouldBe defined
+    }
   }
 }
