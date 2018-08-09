@@ -4,47 +4,38 @@ import java.time.LocalDateTime
 import scala.collection.mutable
 
 case class Invoice(
-  id: Option[Int] = None) {
-  val items: mutable.ListBuffer[InvoiceItem] = mutable.ListBuffer()
+  id: Option[Int] = None,
+  recipient: Option[String] = None,
+  items: List[InvoiceItem] = Nil,
+  sent: Option[LocalDateTime] = None,
+  reminded: Option[LocalDateTime] = None,
+  paymentReceived: Option[LocalDateTime] = None)
+{
   private[this] var totalAmount: Int = 0
-  var recipient: Option[String] = None
-  var sent: Option[LocalDateTime] = None
-  var reminded: Option[LocalDateTime] = None
-  var paymentReceived: Option[LocalDateTime] = None
 
   def changeRecipient(recipient: Option[String]): Invoice = {
-    this.recipient = recipient
-    this
+    require(sent.isEmpty)
+    Invoice(id, recipient, items, sent, reminded, paymentReceived)
   }
 
-  def addItem(description: String, amount: Int): Invoice = {
+  def addItem(item: InvoiceItem): Invoice = {
     require(sent.isEmpty)
-
-    items += new InvoiceItem(description, amount)
-    totalAmount += amount
-    this
+    Invoice(id, recipient, item :: items, sent, reminded, paymentReceived)
   }
 
   def removeItem(item: InvoiceItem): Invoice = {
     require(sent.isEmpty)
-
-    items -= item
-    totalAmount -= item.amount
-    this
+    Invoice(id, recipient, items.filterNot(_ == item), sent, reminded, paymentReceived)
   }
 
-  def send(): Invoice = {
-    sent = Some(LocalDateTime.now())
-    this
-  }
+  def send(): Invoice = Invoice(id, recipient, items, Some(LocalDateTime.now()), reminded, paymentReceived)
 
   def remind(): Invoice = {
-    reminded = Some(LocalDateTime.now())
-    this
+    Invoice(id, recipient, items, sent, Some(LocalDateTime.now()), paymentReceived)
   }
 
   def paymentReceived(when: LocalDateTime): Invoice = {
-    paymentReceived = Some(when)
-    this
+    require(sent.isDefined)
+    Invoice(id, recipient, items, sent, reminded, Some(when))
   }
 }
