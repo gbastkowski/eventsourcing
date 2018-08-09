@@ -4,10 +4,12 @@ import scala.collection.mutable
 
 class Invoice {
   var id: Option[Int] = None
-  val recipients: mutable.ListBuffer[String] = mutable.ListBuffer()
+  val items: mutable.ListBuffer[InvoiceItem] = mutable.ListBuffer()
+  var recipient: Option[String] = None
 
-  def addRecipient(recipient: String): Unit = {
-    recipients += recipient
+  def changeRecipient(recipient: Option[String]): Unit = this.recipient = recipient
+
+  def addItem(description: String, amount: Int): Unit = {
+    items += new InvoiceItem(description, amount)
   }
-
 }
