@@ -4,17 +4,18 @@ import org.scalatest._
 
 class InvoiceSpec extends FreeSpec with Matchers {
   "An invoice" - {
-    val item = InvoiceItem("Coke", 1)
+    val coke = InvoiceItem("Coke", 1)
+    val fries = InvoiceItem("Fries", 2)
 
     "which is new and empty" - {
       val invoice = new Invoice()
 
       "can add an item" in {
-        invoice.addItem(item).items should have size 1
+        invoice.addItem(coke).items should have size 1
       }
 
       "can remove an item" in {
-        invoice.addItem(item).removeItem(item).items shouldBe empty
+        invoice.addItem(coke).removeItem(coke).items shouldBe empty
       }
 
       "can change it's recipient" in {
@@ -30,11 +31,18 @@ class InvoiceSpec extends FreeSpec with Matchers {
       }
     }
 
+    "with two items" - {
+      val invoice = new Invoice().addItem(coke).addItem(fries)
+      "has a correct totalAmount" in {
+        invoice.totalAmount shouldBe 3
+      }
+    }
+
     "which has been sent" - {
-      val invoice = new Invoice().addItem(item).send()
+      val invoice = new Invoice().addItem(coke).send()
 
       "cannot add items" in {
-        an[IllegalArgumentException] should be thrownBy invoice.addItem(item)
+        an[IllegalArgumentException] should be thrownBy invoice.addItem(coke)
       }
 
       "cannot remove items" in {

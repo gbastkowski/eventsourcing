@@ -11,7 +11,7 @@ case class Invoice(
   reminded: Option[LocalDateTime] = None,
   paymentReceived: Option[LocalDateTime] = None)
 {
-  private[this] var totalAmount: Int = 0
+  def totalAmount: Int = items.map(_.amount).sum
 
   def changeRecipient(recipient: Option[String]): Invoice = {
     require(sent.isEmpty)
