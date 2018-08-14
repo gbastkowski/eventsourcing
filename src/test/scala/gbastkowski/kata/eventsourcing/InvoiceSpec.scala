@@ -9,24 +9,19 @@ class InvoiceSpec extends FreeSpec with Matchers {
     val fries = InvoiceItem(2, "Fries", 2)
 
     "which is new and empty" - {
-      def invoice = new Invoice
+      def invoice = Invoice.create(1)
 
       "can add an item" in {
-        val tested = invoice
-        tested.addItem(coke)
-        tested.items should have size 1
+        invoice.addItem(coke).items should have size 1
       }
 
       "can change it's recipient" in {
-        val tested = invoice
-        tested.changeRecipient(Some("Recipient"))
-        tested.recipient shouldBe Some("Recipient")
+        val tested = invoice.changeRecipient(true)
+        tested.recipient shouldBe true
       }
 
       "can be sent" in {
-        val tested = invoice
-        tested.send()
-        tested.sent shouldBe true
+        val tested = invoice.send().sent shouldBe true
       }
 
       "cannot be reminded" in {
@@ -39,17 +34,10 @@ class InvoiceSpec extends FreeSpec with Matchers {
     }
 
     "with two items" - {
-      def invoice = {
-        val i = new Invoice
-        i.addItem(coke)
-        i.addItem(fries)
-        i
-      }
+      def invoice = Invoice.create(1).addItems(coke, fries)
 
       "can remove an item" in {
-        val tested = invoice
-        tested.removeItem(coke.id)
-        tested.items should have size(1)
+       invoice.removeItem(coke.id).items should have size(1)
       }
 
       "has a correct totalAmount" in {
@@ -58,9 +46,8 @@ class InvoiceSpec extends FreeSpec with Matchers {
     }
 
     "which has been sent" - {
-      val tested = new Invoice
-      tested.addItem(coke)
-      tested.send()
+      val tested = Invoice.create(1).send()
+      // tested.addItem(coke)
 
       "cannot add items" in {
         an[IllegalArgumentException] should be thrownBy tested.addItem(coke)
@@ -71,8 +58,7 @@ class InvoiceSpec extends FreeSpec with Matchers {
       }
 
       "can be reminded" in {
-        tested.remind()
-        tested.reminded shouldBe true
+        tested.remind().reminded shouldBe true
       }
     }
   }

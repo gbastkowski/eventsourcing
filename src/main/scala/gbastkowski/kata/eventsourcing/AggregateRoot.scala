@@ -2,19 +2,14 @@ package gbastkowski.kata.eventsourcing
 
 import scala.collection.mutable
 
-trait AggregateRoot[T] {
-  private[this] val uncommited = mutable.Queue[T]()
+trait AggregateRoot[AR <: AggregateRoot[AR, Event], Event] extends EventSourced[AR, Event]{
+  def uncommittedEvents: List[Event]
 
-  def uncommittedEvents: Iterable[T] = uncommited
+  def markCommitted(): AR
 
-  def markCommitted(): Unit = uncommited.clear()
+  def loadFromHistory(history: Iterable[Event]): Unit = history foreach applyEvent
 
-  def loadFromHistory(history: Iterable[T]): Unit = history foreach applyEvent
-
-  protected val applyEvent: T ⇒ Unit
-
-  protected def record(e: T): Unit = {
+  protected def record(e: Event): Unit = {
     applyEvent(e)
-    uncommited += e
   }
 }
