@@ -9,7 +9,7 @@ class AggregateRootSpec extends FreeSpec with Matchers {
       val invoice = Invoice.create(1)
 
       Invoice.loadFromHistory(Seq(
-        InvoiceCreated(1)))
+        InvoiceEvent.Created(1)))
     }
   }
 

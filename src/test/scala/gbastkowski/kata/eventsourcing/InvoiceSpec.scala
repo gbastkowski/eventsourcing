@@ -45,9 +45,13 @@ class InvoiceSpec extends FreeSpec with Matchers {
       }
     }
 
-    "which has been sent" - {
+    "which has a send event" - {
       val tested = Invoice.create(1).send()
       // tested.addItem(coke)
+
+      "should be ready to send" in {
+        tested.uncommittedEvents should have size(2)
+      }
 
       "cannot add items" in {
         an[IllegalArgumentException] should be thrownBy tested.addItem(coke)

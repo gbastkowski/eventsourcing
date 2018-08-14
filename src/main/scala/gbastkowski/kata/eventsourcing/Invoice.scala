@@ -4,10 +4,11 @@ import java.time.LocalDateTime
 import scala.collection.mutable
 
 object Invoice extends AggregateFactory[Invoice, InvoiceEvent] {
-  def create(invoiceId: Int) = applyEvent(InvoiceCreated(invoiceId))
+  import InvoiceEvent.Created
+  def create(invoiceId: Int) = applyEvent(Created(invoiceId))
 
   def applyEvent = {
-    case e: InvoiceCreated ⇒ Invoice(e :: Nil, e.invoiceId)
+    case e: Created ⇒ Invoice(e :: Nil, e.invoiceId)
     case event ⇒ unhandled(event)
   }
 }
@@ -21,51 +22,52 @@ case class Invoice(
   reminded: Boolean = false,
   paid: Boolean = false
 ) extends AggregateRoot[Invoice, InvoiceEvent] {
+  import InvoiceEvent._
 
   def totalAmount: Int = items.values.map(_.amount).sum
 
   def changeRecipient(r: Boolean): Invoice = {
     require(!sent)
-    applyEvent(InvoiceRecipientChanged(r))
+    applyEvent(RecipientChanged(r))
   }
 
   def addItem(item: InvoiceItem): Invoice = {
     require(!sent)
-    applyEvent(InvoiceItemAdded(item))
+    applyEvent(ItemAdded(item))
   }
 
   def addItems(items: InvoiceItem*): Invoice = items.foldLeft(this)(_ addItem _)
 
   def removeItem(item: Int): Invoice = {
     require(!sent)
-    applyEvent(InvoiceItemRemoved(item))
+    applyEvent(ItemRemoved(item))
   }
 
   def send(): Invoice = {
     require(!sent, "invoice already sent")
     // require(recipient, "cannot send invoice to unknown recipient")
 
-    applyEvent(InvoiceSent(LocalDateTime.now))
+    applyEvent(Sent(LocalDateTime.now))
   }
 
   def remind(): Invoice = {
     require(sent)
-    applyEvent(InvoiceReminded(LocalDateTime.now))
+    applyEvent(Reminded(LocalDateTime.now))
   }
 
   def receivePayment(when: LocalDateTime): Invoice = {
     require(paid)
-    applyEvent(InvoicePaymentReceived(LocalDateTime.now))
+    applyEvent(PaymentReceived(LocalDateTime.now))
   }
 
   def markCommitted(): Invoice = copy(uncommittedEvents = Nil)
 
   def applyEvent = {
-    case e: InvoiceSent ⇒ copy(e :: uncommittedEvents, sent = true)
-    case e: InvoiceReminded ⇒ copy(e :: uncommittedEvents, reminded = true)
-    case e: InvoiceItemAdded ⇒ copy(e :: uncommittedEvents, items = items + e.item.id → e.item)
-    case e: InvoiceItemRemoved ⇒ copy(e :: uncommittedEvents, items = items - e.itemId)
-    case e: InvoiceRecipientChanged ⇒ copy(e :: uncommittedEvents, recipient = e.recipient)
+    case e: Sent ⇒ copy(e :: uncommittedEvents, sent = true)
+    case e: Reminded ⇒ copy(e :: uncommittedEvents, reminded = true)
+    case e: ItemAdded ⇒ copy(e :: uncommittedEvents, items = items + e.item.id → e.item)
+    case e: ItemRemoved ⇒ copy(e :: uncommittedEvents, items = items - e.itemId)
+    case e: RecipientChanged ⇒ copy(e :: uncommittedEvents, recipient = e.recipient)
     case event ⇒ unhandled(event)
   }
 
