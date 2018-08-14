@@ -6,8 +6,8 @@ class AggregateRootSpec extends FreeSpec with Matchers {
 
   "An empty invoice" - {
     "can be created" in {
-      val invoice = Invoice()
-      Invoice.loadFromHistory(Seq(
+      val invoice = new Invoice
+      invoice.loadFromHistory(Seq(
         InvoiceCreated(1)))
     }
   }

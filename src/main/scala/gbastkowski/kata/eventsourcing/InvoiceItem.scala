@@ -1,3 +1,3 @@
 package gbastkowski.kata.eventsourcing
 
-case class InvoiceItem(description: String, amount: Int)
+case class InvoiceItem(id: Int, description: String, amount: Int)

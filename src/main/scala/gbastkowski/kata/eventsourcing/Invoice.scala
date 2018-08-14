@@ -3,47 +3,59 @@ package gbastkowski.kata.eventsourcing
 import java.time.LocalDateTime
 import scala.collection.mutable
 
-object Invoice extends AggregateRoot[InvoiceEvent] {
-  protected def applyEvent: InvoiceEvent ⇒ Unit = {
-    case InvoiceCreated(invoiceId) ⇒ Unit
-    case _ ⇒ Unit
-  }
-}
+class Invoice extends AggregateRoot[InvoiceEvent] {
 
-case class Invoice(
-  id: Option[Int] = None,
-  recipient: Option[String] = None,
-  items: List[InvoiceItem] = Nil,
-  sent: Option[LocalDateTime] = None,
-  reminded: Option[LocalDateTime] = None,
-  paymentReceived: Option[LocalDateTime] = None)
-{
-  def totalAmount: Int = items.map(_.amount).sum
+  var id: Int = _
+  var recipient: Option[String] = None
+  var items: Map[Int, InvoiceItem] = Map()
+  var sent: Option[LocalDateTime] = None
+  var reminded: Option[LocalDateTime] = None
+  var paid: Option[LocalDateTime] = None
 
-  def changeRecipient(recipient: Option[String]): Invoice = {
+  def totalAmount: Int = items.values.map(_.amount).sum
+
+  def changeRecipient(r: Option[String]): Invoice = {
     require(sent.isEmpty)
-    Invoice(id, recipient, items, sent, reminded, paymentReceived)
+    record(InvoiceRecipientChanged(r))
+    this
   }
 
   def addItem(item: InvoiceItem): Invoice = {
     require(sent.isEmpty)
-    Invoice(id, recipient, item :: items, sent, reminded, paymentReceived)
+    record(InvoiceItemAdded(item))
+    this
   }
 
-  def removeItem(item: InvoiceItem): Invoice = {
+  def removeItem(item: Int): Invoice = {
     require(sent.isEmpty)
-    Invoice(id, recipient, items.filterNot(_ == item), sent, reminded, paymentReceived)
+    record(InvoiceItemRemoved(item))
+    this
   }
 
-  def send(): Invoice = Invoice(id, recipient, items, Some(LocalDateTime.now()), reminded, paymentReceived)
+  def send(): Invoice = {
+    record(InvoiceSent(LocalDateTime.now))
+    this
+  }
 
   def remind(): Invoice = {
     require(sent.isDefined)
-    Invoice(id, recipient, items, sent, Some(LocalDateTime.now()), paymentReceived)
+    record(InvoiceReminded(LocalDateTime.now))
+    this
   }
 
   def paymentReceived(when: LocalDateTime): Invoice = {
-    require(sent.isDefined)
-    Invoice(id, recipient, items, sent, reminded, Some(when))
+    require(paid.isDefined)
+    record(InvoicePaymentReceived(LocalDateTime.now))
+    this
+  }
+
+  protected val applyEvent: InvoiceEvent ⇒ Unit = {
+    case InvoiceCreated(invoiceId) ⇒ Unit
+    case InvoiceItemAdded(item) ⇒ items += item.id → item
+    case InvoiceItemRemoved(itemId) ⇒ items -= itemId
+    case InvoiceRecipientChanged(r) ⇒ recipient = r
+    case InvoiceSent(d) ⇒ sent = Some(d)
+    case InvoiceReminded(d) ⇒ reminded = Some(d)
+    case InvoicePaymentReceived(d) ⇒ paid = Some(d)
   }
 }

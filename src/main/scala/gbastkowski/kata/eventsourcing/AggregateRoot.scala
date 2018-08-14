@@ -11,7 +11,7 @@ trait AggregateRoot[T] {
 
   def loadFromHistory(history: Iterable[T]): Unit = history foreach applyEvent
 
-  protected def applyEvent: T ⇒ Unit
+  protected val applyEvent: T ⇒ Unit
 
   protected def record(e: T): Unit = {
     applyEvent(e)
