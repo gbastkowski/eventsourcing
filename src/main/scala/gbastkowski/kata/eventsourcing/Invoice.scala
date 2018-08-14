@@ -3,6 +3,13 @@ package gbastkowski.kata.eventsourcing
 import java.time.LocalDateTime
 import scala.collection.mutable
 
+object Invoice extends AggregateRoot[InvoiceEvent] {
+  protected def applyEvent: InvoiceEvent ⇒ Unit = {
+    case InvoiceCreated(invoiceId) ⇒ Unit
+    case _ ⇒ Unit
+  }
+}
+
 case class Invoice(
   id: Option[Int] = None,
   recipient: Option[String] = None,
