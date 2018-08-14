@@ -8,24 +8,24 @@ class Invoice extends AggregateRoot[InvoiceEvent] {
   var id: Int = _
   var recipient: Option[String] = None
   var items: Map[Int, InvoiceItem] = Map()
-  var sent: Option[LocalDateTime] = None
-  var reminded: Option[LocalDateTime] = None
-  var paid: Option[LocalDateTime] = None
+  var sent: Boolean = false
+  var reminded: Boolean = false
+  var paid: Boolean = false
 
   def totalAmount: Int = items.values.map(_.amount).sum
 
   def changeRecipient(r: Option[String]): Unit = {
-    require(sent.isEmpty)
+    require(!sent)
     record(InvoiceRecipientChanged(r))
   }
 
   def addItem(item: InvoiceItem): Unit = {
-    require(sent.isEmpty)
+    require(!sent)
     record(InvoiceItemAdded(item))
   }
 
   def removeItem(item: Int): Unit = {
-    require(sent.isEmpty)
+    require(!sent)
     record(InvoiceItemRemoved(item))
   }
 
@@ -34,12 +34,12 @@ class Invoice extends AggregateRoot[InvoiceEvent] {
   }
 
   def remind(): Unit = {
-    require(sent.isDefined)
+    require(sent)
     record(InvoiceReminded(LocalDateTime.now))
   }
 
   def paymentReceived(when: LocalDateTime): Unit = {
-    require(paid.isDefined)
+    require(paid)
     record(InvoicePaymentReceived(LocalDateTime.now))
   }
 
@@ -48,8 +48,8 @@ class Invoice extends AggregateRoot[InvoiceEvent] {
     case InvoiceItemAdded(item) ⇒ items += item.id → item
     case InvoiceItemRemoved(itemId) ⇒ items -= itemId
     case InvoiceRecipientChanged(r) ⇒ recipient = r
-    case InvoiceSent(d) ⇒ sent = Some(d)
-    case InvoiceReminded(d) ⇒ reminded = Some(d)
-    case InvoicePaymentReceived(d) ⇒ paid = Some(d)
+    case InvoiceSent(d) ⇒ sent = true
+    case InvoiceReminded(d) ⇒ reminded = true
+    case InvoicePaymentReceived(d) ⇒ paid = true
   }
 }

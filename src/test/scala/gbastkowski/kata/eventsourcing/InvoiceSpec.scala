@@ -26,7 +26,7 @@ class InvoiceSpec extends FreeSpec with Matchers {
       "can be sent" in {
         val tested = invoice
         tested.send()
-        tested.sent shouldBe defined
+        tested.sent shouldBe true
       }
 
       "cannot be reminded" in {
@@ -72,7 +72,7 @@ class InvoiceSpec extends FreeSpec with Matchers {
 
       "can be reminded" in {
         tested.remind()
-        tested.reminded shouldBe defined
+        tested.reminded shouldBe true
       }
     }
   }
