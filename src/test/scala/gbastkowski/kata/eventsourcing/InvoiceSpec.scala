@@ -12,19 +12,21 @@ class InvoiceSpec extends FreeSpec with Matchers {
       def invoice = new Invoice
 
       "can add an item" in {
-        invoice.addItem(coke).items should have size 1
-      }
-
-      "can remove an item" in {
-        invoice.addItem(coke).removeItem(coke.id).items shouldBe empty
+        val tested = invoice
+        tested.addItem(coke)
+        tested.items should have size 1
       }
 
       "can change it's recipient" in {
-        invoice.changeRecipient(Some("Recipient")).recipient shouldBe Some("Recipient")
+        val tested = invoice
+        tested.changeRecipient(Some("Recipient"))
+        tested.recipient shouldBe Some("Recipient")
       }
 
       "can be sent" in {
-        invoice.send().sent shouldBe defined
+        val tested = invoice
+        tested.send()
+        tested.sent shouldBe defined
       }
 
       "cannot be reminded" in {
@@ -37,25 +39,40 @@ class InvoiceSpec extends FreeSpec with Matchers {
     }
 
     "with two items" - {
-      val invoice = new Invoice().addItem(coke).addItem(fries)
+      def invoice = {
+        val i = new Invoice
+        i.addItem(coke)
+        i.addItem(fries)
+        i
+      }
+
+      "can remove an item" in {
+        val tested = invoice
+        tested.removeItem(coke.id)
+        tested.items should have size(1)
+      }
+
       "has a correct totalAmount" in {
         invoice.totalAmount shouldBe 3
       }
     }
 
     "which has been sent" - {
-      val invoice = new Invoice().addItem(coke).send()
+      val tested = new Invoice
+      tested.addItem(coke)
+      tested.send()
 
       "cannot add items" in {
-        an[IllegalArgumentException] should be thrownBy invoice.addItem(coke)
+        an[IllegalArgumentException] should be thrownBy tested.addItem(coke)
       }
 
       "cannot remove items" in {
-        an[IllegalArgumentException] should be thrownBy invoice.removeItem(0)
+        an[IllegalArgumentException] should be thrownBy tested.removeItem(0)
       }
 
       "can be reminded" in {
-        invoice.remind().reminded shouldBe defined
+        tested.remind()
+        tested.reminded shouldBe defined
       }
     }
   }

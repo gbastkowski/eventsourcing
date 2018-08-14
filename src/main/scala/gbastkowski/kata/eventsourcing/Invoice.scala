@@ -14,39 +14,33 @@ class Invoice extends AggregateRoot[InvoiceEvent] {
 
   def totalAmount: Int = items.values.map(_.amount).sum
 
-  def changeRecipient(r: Option[String]): Invoice = {
+  def changeRecipient(r: Option[String]): Unit = {
     require(sent.isEmpty)
     record(InvoiceRecipientChanged(r))
-    this
   }
 
-  def addItem(item: InvoiceItem): Invoice = {
+  def addItem(item: InvoiceItem): Unit = {
     require(sent.isEmpty)
     record(InvoiceItemAdded(item))
-    this
   }
 
-  def removeItem(item: Int): Invoice = {
+  def removeItem(item: Int): Unit = {
     require(sent.isEmpty)
     record(InvoiceItemRemoved(item))
-    this
   }
 
-  def send(): Invoice = {
+  def send(): Unit = {
     record(InvoiceSent(LocalDateTime.now))
-    this
   }
 
-  def remind(): Invoice = {
+  def remind(): Unit = {
     require(sent.isDefined)
     record(InvoiceReminded(LocalDateTime.now))
-    this
   }
 
-  def paymentReceived(when: LocalDateTime): Invoice = {
+  def paymentReceived(when: LocalDateTime): Unit = {
     require(paid.isDefined)
     record(InvoicePaymentReceived(LocalDateTime.now))
-    this
   }
 
   protected val applyEvent: InvoiceEvent ⇒ Unit = {
