@@ -34,7 +34,7 @@ class InvoiceSpec extends FreeSpec with Matchers {
       }
 
       "cannot receive payments" in {
-        an[IllegalArgumentException] should be thrownBy invoice.paymentReceived(LocalDateTime.now())
+        an[IllegalArgumentException] should be thrownBy invoice.receivePayment(LocalDateTime.now())
       }
     }
 

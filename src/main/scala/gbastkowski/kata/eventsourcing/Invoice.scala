@@ -38,7 +38,7 @@ class Invoice extends AggregateRoot[InvoiceEvent] {
     record(InvoiceReminded(LocalDateTime.now))
   }
 
-  def paymentReceived(when: LocalDateTime): Unit = {
+  def receivePayment(when: LocalDateTime): Unit = {
     require(paid)
     record(InvoicePaymentReceived(LocalDateTime.now))
   }
