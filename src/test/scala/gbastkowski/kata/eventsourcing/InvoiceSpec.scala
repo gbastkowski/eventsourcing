@@ -21,20 +21,12 @@ class InvoiceSpec extends FreeSpec with Matchers {
       }
 
       "can be sent" in {
-        val tested = invoice.send().sent shouldBe true
-      }
-
-      "cannot be reminded" in {
-        an[IllegalArgumentException] should be thrownBy invoice.remind()
-      }
-
-      "cannot receive payments" in {
-        an[IllegalArgumentException] should be thrownBy invoice.receivePayment(LocalDateTime.now())
+        an[IllegalArgumentException] should be thrownBy invoice.send
       }
     }
 
     "with two items" - {
-      def invoice = Invoice.create(1).addItems(coke, fries)
+      def invoice = Invoice.create(1).addItem(coke).addItem(fries)
 
       "can remove an item" in {
        invoice.removeItem(coke.id).items should have size(1)
@@ -42,27 +34,6 @@ class InvoiceSpec extends FreeSpec with Matchers {
 
       "has a correct totalAmount" in {
         invoice.totalAmount shouldBe 3
-      }
-    }
-
-    "which has a send event" - {
-      val tested = Invoice.create(1).send()
-      // tested.addItem(coke)
-
-      "should be ready to send" in {
-        tested.uncommittedEvents should have size(2)
-      }
-
-      "cannot add items" in {
-        an[IllegalArgumentException] should be thrownBy tested.addItem(coke)
-      }
-
-      "cannot remove items" in {
-        an[IllegalArgumentException] should be thrownBy tested.removeItem(0)
-      }
-
-      "can be reminded" in {
-        tested.remind().reminded shouldBe true
       }
     }
   }

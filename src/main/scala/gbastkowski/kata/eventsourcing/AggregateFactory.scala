@@ -1,9 +1,10 @@
 package gbastkowski.kata.eventsourcing
 
 trait AggregateFactory[AR <: AggregateRoot[AR, Event], Event] extends EventSourced[AR, Event] {
-  def loadFromHistory(history: Iterable[Event]): AR = {
+  def loadFromHistory[T <: AR](history: Iterable[Event]): T = {
     history.tail.
       foldLeft(applyEvent(history.head)) { _ applyEvent _ }.
-      markCommitted()
+      asInstanceOf[AR].
+      markCommitted.asInstanceOf[T]
   }
 }
