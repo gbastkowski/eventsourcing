@@ -1,7 +1,7 @@
 package gbastkowski.kata.eventsourcing
 
-trait EventSourced[ES <: EventSourced[ES, Event], Event] {
-  def applyEvent: Event ⇒ ES
+trait EventSourced[Source <: EventSourced[Source, Event], Event] {
+  def applyEvent: Event ⇒ Source
 
-  def unhandled(event: Event): ES = throw new RuntimeException(s"event $event does not apply to $this")
+  def unhandled(event: Event): Source = throw new RuntimeException(s"event $event does not apply to $this")
 }

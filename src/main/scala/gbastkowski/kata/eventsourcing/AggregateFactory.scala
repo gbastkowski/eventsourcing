@@ -4,7 +4,8 @@ trait AggregateFactory[AR <: AggregateRoot[AR, Event], Event] extends EventSourc
   def loadFromHistory[T <: AR](history: Iterable[Event]): T = {
     history.tail.
       foldLeft(applyEvent(history.head)) { _ applyEvent _ }.
-      asInstanceOf[AR].
-      markCommitted.asInstanceOf[T]
+      asInstanceOf[AR]. // pain point
+      markCommitted.
+      asInstanceOf[T] // pain point
   }
 }
